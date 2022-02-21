@@ -107,6 +107,8 @@ const Settings = ({ close, isOpen } : SettingsMenuProps) => {
             const storedFromAddress = await window.electron.store.get('fromAddress');
             const storedFromPW = await window.electron.store.get('fromPW');
 
+            if (!storedKindleAddress || !storedFromAddress || !storedFromPW) setSettingsHaveChanged(true);
+
             setKindleAddress(storedKindleAddress);
             setFromAddress(storedFromAddress);
             setFromPW(storedFromPW);
@@ -122,7 +124,7 @@ const Settings = ({ close, isOpen } : SettingsMenuProps) => {
     }, [])
 
     useEffect(() => {
-        if (!storedSettings.kindleAddress || !storedSettings.fromAddress || !storedSettings.fromPW) return;
+        if (!storedSettings.kindleAddress || !storedSettings.fromAddress || !storedSettings.fromPW) return; // handled elsewhere
         setSettingsHaveChanged(!((kindleAddress == storedSettings.kindleAddress) && (fromAddress == storedSettings.fromAddress) && (fromPW == storedSettings.fromPW)))
     }, [kindleAddress, fromAddress, fromPW])
 

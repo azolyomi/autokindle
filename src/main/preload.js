@@ -1,6 +1,18 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
+  email: {
+    sendTest() {
+      return ipcRenderer.invoke("SendTestEmail").then(result => {
+        return result;
+      });
+    },
+    send(path) {
+      return ipcRenderer.invoke("SendEmail", path).then(result => {
+        return result;
+      });
+    }
+  },
   store: {
     get(val) {
       return ipcRenderer.invoke("electron-store-get", val).then((result) => {

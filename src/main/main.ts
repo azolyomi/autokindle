@@ -14,6 +14,8 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+
+var nodemailer = require("nodemailer");
 const Store = require('electron-store');
 
 let store = new Store();
@@ -29,6 +31,72 @@ export default class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+
+async function SendTestEmail() {
+    return new Promise((resolve, reject) => {
+      const fromAddress = store.get("fromAddress");
+      const fromPW = store.get("fromPW");
+      var transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: fromAddress,
+          pass: fromPW,
+        },
+      });
+
+      const mailOptions = {
+        from: fromAddress, 
+        to: fromAddress,
+        subject: "AutoKindle Email Test!",
+      };
+
+      transporter.sendMail(mailOptions, function (err, info) {
+        if (err) resolve({err: err});
+        else resolve({err: false, info: info});
+      });
+    })
+}
+
+async function SendEmail(bookPath) {
+  return new Promise((resolve, reject) => {
+    const kindleAddress = store.get("kindleAddress");
+    const fromAddress = store.get("fromAddress");
+    const fromPW = store.get("fromPW");
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: fromAddress,
+        pass: fromPW,
+      },
+    });
+
+    const mailOptions = {
+      from: fromAddress, 
+      to: kindleAddress,
+      subject: "AutoKindle Delivery!",
+      attachments: [
+        {
+          path: bookPath
+        }
+      ]
+    };
+
+    transporter.sendMail(mailOptions, function (err, info) {
+      if (err) resolve({err: err});
+      else resolve({err: false, info: info});
+    });
+  })
+}
+
+ipcMain.handle("SendTestEmail", async (event) => {
+  console.log("ipcMain: Executing SendTestEmail");
+  return await SendTestEmail();
+});
+
+ipcMain.handle("SendEmail", async (event, path) => {
+  console.log("ipcMain: Executing SendEmail with path: ", path);
+  return await SendEmail(path);
+});
 
 ipcMain.handle("electron-store-get", async (event, val) => {
   const res = store.get(val);
@@ -89,7 +157,7 @@ const createWindow = async () => {
     minHeight: 400,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      // devTools: false,
+      devTools: false,
       preload: path.join(__dirname, 'preload.js'),
     },
   });

@@ -4,7 +4,7 @@ import AutoKindle from './AutoKindle';
 
 
 const HeaderContainer = styled.div`
-  position: absolute;
+  position: relative;
   width: 100%;
   height: auto;
   display: flex;

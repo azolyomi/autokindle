@@ -6,6 +6,10 @@ import HomeScreen from './components/HomeScreen';
 declare global {
   interface Window {
     electron: {
+      email: {
+        send: (path: string) => any;
+        sendTest: () => any;
+      }
       store: {
         get: (key: string) => any;
         set: (key: string, val: any) => void;
