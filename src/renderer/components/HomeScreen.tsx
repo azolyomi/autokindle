@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Sidebar from './Sidebar';
+import AutoKindle from './AutoKindle';
 
 
 const HeaderContainer = styled.div`
@@ -35,6 +36,7 @@ const Home = () => {
   return (
       <Container>
         <Header />
+        <AutoKindle />
         <Sidebar />
       </Container>
   );

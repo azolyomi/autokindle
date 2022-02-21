@@ -5,10 +5,10 @@ import { IoIosSettings } from 'react-icons/io';
 
 import Settings from './Settings';
 
-const SIDEBAR_WIDTH = `25vw`;
+const SIDEBAR_WIDTH = `max(25vw, 200px)`;
 const SIDEBAR_BACKGROUND_COLOR = "#0D0D0D"
 export const ICON_SIZE = `30px`;
-const SIDEBAR_ANIMATION_DURATION = '100ms';
+const SIDEBAR_ANIMATION_DURATION= '200ms';
 
 
 const SidebarWrapper = styled.div`
@@ -37,35 +37,32 @@ export const SidebarButton = styled.div`
 
 const SidebarAnimationIn = keyframes`
   0% {
-    width: 0px;
-    background-color: transparent;
+      transform: translateX(${SIDEBAR_WIDTH})
   }
   100% {
-    width: ${SIDEBAR_WIDTH};
-    background-color: ${SIDEBAR_BACKGROUND_COLOR};
+    transform: translateX(0px);
   }
 `
 const SidebarAnimationOut = keyframes`
   0% {
-    width: ${SIDEBAR_WIDTH};
-    background-color: ${SIDEBAR_BACKGROUND_COLOR};
+    transform: translateX(0px);
   }
   100% {
-    width: 0px;
-    background-color: transparent;
+    transform: translateX(${SIDEBAR_WIDTH});
   }
 `
 
 const SidebarComponent = styled("div")<{isOpen: boolean, shouldAnimate: boolean}>`
   height: 100vh;
-  width: 0px;
-  background-color: transparent;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: ${SIDEBAR_WIDTH};
+  ${props => !props.isOpen ? `transform: translateX(${SIDEBAR_WIDTH});` : 'transform: translateX(0);'}
+  background-color: ${SIDEBAR_BACKGROUND_COLOR};
   ${props => {
     if (props.isOpen) return css`
       animation: ${SidebarAnimationIn} ${SIDEBAR_ANIMATION_DURATION} ease-out;
-      background-color: ${SIDEBAR_BACKGROUND_COLOR};
-      width: ${SIDEBAR_WIDTH};
-      min-width: 200px;
     `
     if (props.shouldAnimate) return css`
       animation: ${SidebarAnimationOut} ${SIDEBAR_ANIMATION_DURATION} ease-out;
@@ -78,7 +75,6 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const shouldAnimate = useIsMounted();
 
-
   return (
     <SidebarWrapper> 
       {!isOpen && (
@@ -87,7 +83,7 @@ const Sidebar = () => {
         </SidebarButton>
       )}
       <SidebarComponent isOpen={isOpen} shouldAnimate={shouldAnimate.current}>
-        {isOpen && <Settings close={(): void => setIsOpen(!isOpen)}/>}
+        <Settings isOpen={isOpen} close={(): void => setIsOpen(!isOpen)}/>
       </SidebarComponent>
     </SidebarWrapper>
   )

@@ -14,17 +14,11 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import Store from "electron-store";
+const Store = require('electron-store');
 
 let store = new Store();
 
 // IPC listener
-ipcMain.on("electron-store-get", async (event, val) => {
-  store.get(val);
-});
-ipcMain.on("electron-store-set", async (event, key, val) => {
-  store.set(key, val);
-});
 
 export default class AppUpdater {
   constructor() {
@@ -36,6 +30,13 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+ipcMain.handle("electron-store-get", async (event, val) => {
+  const res = store.get(val);
+  return res;
+});
+ipcMain.on("electron-store-set", async (event, key, val) => {
+  store.set(key, val);
+});
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
@@ -88,7 +89,7 @@ const createWindow = async () => {
     minHeight: 400,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      devTools: false,
+      // devTools: false,
       preload: path.join(__dirname, 'preload.js'),
     },
   });
